@@ -8,13 +8,13 @@ import Spinner from 'react-bootstrap/Spinner';
 import { getBooks, getBook } from '../../graphql/queries';
 
 function BookList() {
-  const [bookId, setBookId] = useState();
+  const [bookId, setBookId] = useState(null);
   const { loading, error, data = {} } = useQuery(getBooks);
   const {
     loading: loadingBook,
     error: errorBook,
     data: dataBook = {},
-  } = useQuery(getBook, { variables: { bookId: bookId } });
+  } = useQuery(getBook, { variables: { bookId: bookId }, skip: bookId === null });
 
   const { books = [] } = data;
   const { book } = dataBook;

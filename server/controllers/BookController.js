@@ -13,7 +13,6 @@ class BookController {
   async getBookById(id) {
     try {
       const book = await Book.findById(id);
-      console.log(id);
       return book;
     } catch (error) {
       return error;

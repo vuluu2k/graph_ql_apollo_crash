@@ -4,8 +4,16 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import Button from 'react-bootstrap/Button';
+import { useMutation, useQuery } from '@apollo/client';
+
+import { getAuthors } from '../../graphql/queries';
 
 function Forms() {
+  const { loading, error, data } = useQuery(getAuthors);
+  console.log(data);
+
+  const { authors = [] } = data;
+
   return (
     <Row>
       <Col xs={12} sm={6}>
@@ -22,10 +30,14 @@ function Forms() {
           <InputGroup className="mb-3">
             <InputGroup.Text>Tác giả</InputGroup.Text>
             <Form.Select aria-label="Chọn tác giả">
-              <option>Open this select menu</option>
-              <option value="1">One</option>
-              <option value="2">Two</option>
-              <option value="3">Three</option>
+              <option>Chọn tác giả bạn muốn</option>
+              {authors.map((item, index) => {
+                return (
+                  <option key={index} value={item.id}>
+                    {item.name}
+                  </option>
+                );
+              })}
             </Form.Select>
           </InputGroup>
           <Button className="float-right" variant="info" type="submit">
