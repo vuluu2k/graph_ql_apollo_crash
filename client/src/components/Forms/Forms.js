@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Col from 'react-bootstrap/Col';
@@ -6,14 +6,14 @@ import Row from 'react-bootstrap/Row';
 import Button from 'react-bootstrap/Button';
 import { useMutation, useQuery } from '@apollo/client';
 
-import { getAuthors } from '../../graphql/queries';
+import { getAuthors, getBooks } from '../../graphql/queries';
 import { createBook, createAuthor } from '../../graphql/mustates';
 
 function Forms() {
   const [fieldBook, setFieldBook] = useState({ name: '', genre: '', authorId: 'other' });
   const [fieldAuthor, setFieldAuthor] = useState({ name: '', age: '' });
   const { loading, data = {} } = useQuery(getAuthors);
-  const [onCreateBook, dataOnCreateBook = {}] = useMutation(createBook, { variables: fieldBook });
+  const [onCreateBook, dataOnCreateBook = {}] = useMutation(createBook);
   const [onCreateAuthor, dataOnCreateAuthor = {}] = useMutation(createAuthor, { variables: fieldAuthor });
   const { authors = [] } = data;
 
@@ -27,11 +27,11 @@ function Forms() {
     setFieldAuthor((prev) => ({ ...prev, [event.target.name]: event.target.value }));
 
   const handleOnCreateBook = () => {
-    onCreateBook();
+    onCreateBook({ variables: { name: nameAuthor, age: parseInt(age) }, refetchQueries: [{ query: getBooks }] });
   };
 
   const handleOnCreateAuthor = () => {
-    onCreateAuthor();
+    onCreateAuthor({ variables: fieldAuthor, refetchQueries: [{ query: getAuthors }] });
   };
 
   return (
@@ -120,4 +120,4 @@ function Forms() {
   );
 }
 
-export default Forms;
+export default memo(Forms);
