@@ -5,32 +5,37 @@ import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import Button from 'react-bootstrap/Button';
 import { useMutation, useQuery } from '@apollo/client';
-import Spinner from 'react-bootstrap/Spinner';
 
 import { getAuthors } from '../../graphql/queries';
-import { createBook } from '../../graphql/mustates';
+import { createBook, createAuthor } from '../../graphql/mustates';
 
 function Forms() {
-  const [fieldBook, setFieldBook] = useState({ name: '', genre: '', authorId: null });
+  const [fieldBook, setFieldBook] = useState({ name: '', genre: '', authorId: 'other' });
+  const [fieldAuthor, setFieldAuthor] = useState({ name: '', age: '' });
   const { loading, data = {} } = useQuery(getAuthors);
+  const [onCreateBook, dataOnCreateBook = {}] = useMutation(createBook, { variables: fieldBook });
+  const [onCreateAuthor, dataOnCreateAuthor = {}] = useMutation(createAuthor, { variables: fieldAuthor });
   const { authors = [] } = data;
 
   const { name, genre, authorId } = fieldBook;
+  const { name: nameAuthor, age } = fieldAuthor;
 
   const handleOnChangeInputAddBook = (event) =>
     setFieldBook((prev) => ({ ...prev, [event.target.name]: event.target.value }));
 
+  const handleOnChangeInputAddAuthor = (event) =>
+    setFieldAuthor((prev) => ({ ...prev, [event.target.name]: event.target.value }));
+
+  const handleOnCreateBook = () => {
+    onCreateBook();
+  };
+
+  const handleOnCreateAuthor = () => {
+    onCreateAuthor();
+  };
+
   return (
     <Row>
-      {loading && (
-        <div
-          style={{ position: 'absolute', width: '100%', height: '100%', backgroundColor: 'rgb(0,0,0,.5)', zIndex: 1 }}
-        >
-          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)' }}>
-            <Spinner animation="border" variant="info" />
-          </div>
-        </div>
-      )}
       <Col xs={12} sm={6}>
         <Form>
           <InputGroup className="mb-3">
@@ -57,17 +62,21 @@ function Forms() {
           <InputGroup className="mb-3">
             <InputGroup.Text>Tác giả</InputGroup.Text>
             <Form.Select name="authorId" value={authorId} onChange={handleOnChangeInputAddBook}>
-              <option>Chọn tác giả bạn muốn</option>
-              {authors.map((item, index) => {
-                return (
-                  <option key={index} value={item.id}>
-                    {item.name}
-                  </option>
-                );
-              })}
+              {(loading && <option value="loading">Đang tải...</option>) || (
+                <React.Fragment>
+                  <option value="other">Chọn tác giả bạn muốn</option>
+                  {authors.map((item, index) => {
+                    return (
+                      <option key={index} value={item.id}>
+                        {item.name}
+                      </option>
+                    );
+                  })}
+                </React.Fragment>
+              )}
             </Form.Select>
           </InputGroup>
-          <Button className="float-right" variant="info" type="submit">
+          <Button className="float-right" variant="info" type="submit" onClick={handleOnCreateBook}>
             Thêm sách
           </Button>
         </Form>
@@ -81,14 +90,28 @@ function Forms() {
 
           <InputGroup className="mb-3">
             <InputGroup.Text>Tên tác giả</InputGroup.Text>
-            <Form.Control type="text" aria-label="Tên tác giả" placeholder="Nhập tên tác giả" />
+            <Form.Control
+              type="text"
+              aria-label="Tên tác giả"
+              placeholder="Nhập tên tác giả"
+              name="name"
+              value={nameAuthor}
+              onChange={handleOnChangeInputAddAuthor}
+            />
           </InputGroup>
 
           <InputGroup className="mb-3">
             <InputGroup.Text>Tuổi</InputGroup.Text>
-            <Form.Control type="number" aria-label="Tuổi" placeholder="Nhập tuổi" />
+            <Form.Control
+              type="number"
+              aria-label="Tuổi"
+              placeholder="Nhập tuổi"
+              name="age"
+              value={age}
+              onChange={handleOnChangeInputAddAuthor}
+            />
           </InputGroup>
-          <Button className="float-right" variant="info" type="submit">
+          <Button className="float-right" variant="info" type="submit" onClick={handleOnCreateAuthor}>
             Thêm tác giả
           </Button>
         </Form>

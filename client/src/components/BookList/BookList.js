@@ -39,7 +39,16 @@ function BookList() {
           <Row>
             {books.map((item, index) => {
               return (
-                <Col key={index} xs={12} sm={6} md={5} lg={4} xl={3} onClick={() => setBookId(item.id)}>
+                <Col
+                  key={index}
+                  xs={12}
+                  sm={6}
+                  md={5}
+                  lg={4}
+                  xl={3}
+                  onClick={() => setBookId(item.id)}
+                  className="mb-2"
+                >
                   <Card border="info" text="dark" bg="info" className="text-center shadow" style={{ width: '100%' }}>
                     <Card.Body>
                       <Card.Title>{item?.name}</Card.Title>
